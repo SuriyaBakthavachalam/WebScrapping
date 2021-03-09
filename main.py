@@ -8,6 +8,7 @@ from flask import Flask, send_from_directory, render_template, request
 import csv
 from requests.adapters import HTTPAdapter
 from requests.packages.urllib3.util.retry import Retry
+from os import environ
 
 retry_strategy = Retry(
     total=3,
@@ -20,7 +21,6 @@ http.mount("https://", adapter)
 http.mount("http://", adapter)
 headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) '
                          'Chrome/88.0.4324.190 Safari/537.36'}
-
 app = Flask(__name__)
 
 
@@ -31,6 +31,7 @@ def HomePage():
 
 @app.route('/WebScrapping', methods=['GET'])
 def WebScrapping():
+    # print(environ.get("CSV_PATH_NAME"))
     google_search = request.args.get('gsearch')
     url_link = "https://google.com/search?q=" + google_search
     final_results = google_search_url(url_link)
@@ -40,7 +41,7 @@ def WebScrapping():
         w = csv.DictWriter(f, ['Title', 'Link'])
         w.writeheader()
         w.writerows(final_results)
-    return send_from_directory("C:/Users/Telliant/PycharmProjects/WebScrapping", filename)
+    return send_from_directory(environ.get("CSV_PATH_NAME"), filename)
 
 
 def google_search_url(url_link, results=[]):
